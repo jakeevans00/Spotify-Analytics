@@ -5,11 +5,12 @@
 
 ## 📋 Table of Contents
 
-1. 🐺 [What is this API ?](#what-is-this-api)
+1. 🐺 [What is this?](#what-is-this)
 2. 🔨 [Installation](#installation)
 3. 🚀 [Build](#build)
 4. 💯 [Tests](#tests)
 5. ☑️ [Code analysis and consistency](#code-analysis-and-consistency)
 6. 📈 [Releases & Changelog](#versions)
 
-Model built in R to predict song success based on sample of 30,000 Spotify tracks. See data source [here]([www.google.com](https://www.kaggle.com/datasets/joebeachcapital/30000-spotify-songs)https://www.kaggle.com/datasets/joebeachcapital/30000-spotify-songs)
+Model built in R to predict song success based on sample of 30,000 Spotify tracks. See data source on [kaggle.com](https://www.kaggle.com/datasets/joebeachcapital/30000-spotify-songs)
+
