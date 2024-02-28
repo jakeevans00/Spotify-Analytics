@@ -25,6 +25,8 @@ raw <- read_csv('19_train.csv')
 
 
 
+# Jake: Examine effects of independent vars on dependent
+
 # Look at shape and column types
 raw %>% glimpse()
 
