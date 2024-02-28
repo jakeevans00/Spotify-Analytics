@@ -56,6 +56,8 @@ sample %>%
   facet_wrap(~metric, scales = 'free') + 
   theme_bw()
 
+# Jake: Examine effects of independent vars on dependent
+
 # Look at shape and column types
 raw %>% glimpse()
 
