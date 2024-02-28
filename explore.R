@@ -1,4 +1,5 @@
 library(tidyverse)
+library(ggplot2)
 
 setwd('/Users/jakeevans/repos/byu/is555/group_project/spotify-data')
 
@@ -22,8 +23,38 @@ raw <- read_csv('19_train.csv')
 
 # Austin: Investigate dependent variable correlations
 
+setwd('./spotify-analytics/data/')
 
+#MODE AND KEY ARE CATEGORICAL
 
+sample <- slice_sample(raw, prop = .4)
+
+sample %>% 
+  distinct() %>% 
+  select(track_popularity, danceability, acousticness, energy, loudness, instrumentalness, speechiness, liveness, valence) %>% 
+  pivot_longer(
+    cols = c(danceability, acousticness, energy, loudness, instrumentalness, speechiness, liveness, valence),
+    names_to = 'metric',
+    values_to = 'value'
+  ) %>% 
+  ggplot(aes(y = track_popularity, x = value)) +
+  geom_point(alpha = 0.3, shape = ".") +
+  facet_wrap(~metric, scales = 'free') + 
+  theme_bw()
+
+# need to do key and mode
+sample %>% 
+  distinct() %>%
+  select(track_popularity, playlist_genre, playlist_subgenre, track_album_release_date) %>% 
+  pivot_longer(
+    cols = c(playlist_genre, playlist_subgenre, track_album_release_date),
+    names_to = 'metric',
+    values_to = 'value'
+  ) %>% 
+  ggplot(aes(y = track_popularity, x = metric)) +
+  geom_bar() +
+  facet_wrap(~metric, scales = 'free') + 
+  theme_bw()
 
 # Look at shape and column types
 raw %>% glimpse()
