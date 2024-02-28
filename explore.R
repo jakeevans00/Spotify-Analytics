@@ -20,6 +20,10 @@ raw <- read_csv('19_train.csv')
 
 # Exploratory Data Analysis
 
+# Austin: Investigate dependent variable correlations
+
+
+
 
 # Look at shape and column types
 raw %>% glimpse()
