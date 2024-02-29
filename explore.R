@@ -377,11 +377,23 @@ df[sample(nrow(df), 10), ]
 library(corrr)
 
 # Here are all the columns in the database
+
+# Explore dependent variable
 raw %>% glimpse()
+raw %>% filter(track_popularity > 98)
+
+summary_stats <- summary(raw$track_popularity)
+summary_sta
+
+sample %>% 
+ggplot(aes(x=track_popularity, fill=track_popularity)) +
+geom_histogram(fill="orange", alpha=0.6) +
+  theme_bw()
 
 # Numeric variables
 numeric_vars <- raw %>% 
   select_if(is.numeric) %>% 
+  select(-mode, -key) %>% 
   colnames()
 numeric_vars
 
@@ -392,13 +404,19 @@ correlation <- df_numeric %>% select(all_of(numeric_vars)) %>%
   correlate()
 rplot(correlation)
 
+matrix <- cor(df_numeric, method=c("pearson"))
+
+library(corrplot)
+corrplot(matrix, type="upper", tl.col="black")
+
 # Categorical variables (mode and key)
 key_labels <- c("C", "C#/Db", "D", "D#/Eb", "E", "F", "F#/Gb", "G", "G#/Ab", "A", "A#/Bb", "B")
 
 raw %>% 
   mutate(key = factor(key, levels = 0:11, labels=key_labels)
-df_categorical
-# Old EDA (Replaced by work ^^^^)
+
+
+# Old EDA (Used by work ^^^^)
 
 # Look at shape and column types
 raw %>% glimpse()
