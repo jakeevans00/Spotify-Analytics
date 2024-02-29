@@ -1,5 +1,6 @@
 library(tidyverse)
 library(ggplot2)
+library(lubridate)
 
 setwd('/Users/jakeevans/repos/byu/is555/group_project/spotify-data')
 
@@ -23,13 +24,13 @@ raw <- read_csv('19_train.csv')
 
 # Austin: Investigate dependent variable correlations
 
-setwd('./spotify-analytics/data/')
+setwd('./555/spotify-analytics/data/')
 
 #MODE AND KEY ARE CATEGORICAL
 
 sample <- slice_sample(raw, prop = .4)
 
-sample %>% 
+raw %>% 
   distinct() %>% 
   select(track_popularity, danceability, acousticness, energy, loudness, instrumentalness, speechiness, liveness, valence) %>% 
   pivot_longer(
@@ -37,24 +38,64 @@ sample %>%
     names_to = 'metric',
     values_to = 'value'
   ) %>% 
-  ggplot(aes(y = track_popularity, x = value)) +
-  geom_point(alpha = 0.3, shape = ".") +
+  ggplot(aes(y = track_popularity, x = value, fill = metric, color = metric)) +
+  geom_point(alpha = 0.05) +
   facet_wrap(~metric, scales = 'free') + 
   theme_bw()
 
-# need to do key and mode
-sample %>% 
+# Genres
+
+raw %>% 
   distinct() %>%
-  select(track_popularity, playlist_genre, playlist_subgenre, track_album_release_date) %>% 
+  select(track_popularity, playlist_genre, playlist_subgenre) %>% 
   pivot_longer(
-    cols = c(playlist_genre, playlist_subgenre, track_album_release_date),
+    cols = c(playlist_genre, playlist_subgenre),
     names_to = 'metric',
     values_to = 'value'
   ) %>% 
-  ggplot(aes(y = track_popularity, x = metric)) +
-  geom_bar() +
-  facet_wrap(~metric, scales = 'free') + 
+  ggplot(aes(y = track_popularity, x = value, fill=value)) +
+  geom_violin() +
+  facet_wrap(~metric, scales = 'free', ncol = 1) + 
   theme_bw()
+
+#Key and Mode
+
+raw %>% 
+  distinct() %>%
+  mutate(key = as.character(key), mode = as.character(mode)) %>% 
+  select(track_popularity, key, mode) %>% 
+  pivot_longer(
+    cols = c(key, mode),
+    names_to = 'metric',
+    values_to = 'value'
+  ) %>% 
+  ggplot(aes(y = track_popularity, x = value, fill=value)) +
+  geom_violin() +
+  facet_wrap(~metric, scales = 'free', ncol = 1) + 
+  theme_bw()
+
+# Release Date
+
+dates <- raw %>% 
+  distinct() %>% 
+  select(track_popularity, track_album_release_date) %>% 
+  mutate(formatted_date = ymd(track_album_release_date)) %>% 
+  mutate(year = if_else(!is.na(formatted_date),year(formatted_date),year(as.numeric(substr(track_album_release_date, 1, 4)))), month = month(formatted_date))
+
+
+
+dates %>% 
+  group_by(month) %>% 
+  summarize(count = n()) %>% 
+  print(n=200)
+
+dates %>% 
+  filter(is.na(year))
+
+raw %>% 
+  group_by(track_album_release_date) %>% 
+  summarize() %>% 
+  print(n=3000)
 
 # Jake: Examine effects of independent vars on dependent
 
