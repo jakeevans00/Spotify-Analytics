@@ -2,7 +2,7 @@ library(tidyverse)
 
 setwd('/Users/jakeevans/repos/byu/is555/group_project/spotify-data')
 
-raw <- read_csv('19_train.csv')
+raw <- read_csv('data/19_train.csv')
 
 # Notes on some of the columns (Taken from Spotify Documentation - https://developer.spotify.com/documentation/web-api/reference/get-audio-features)
 
@@ -26,6 +26,32 @@ raw <- read_csv('19_train.csv')
 
 
 # Jake: Examine effects of independent vars on dependent
+
+library(corrr)
+
+# Here are all the columns in the database
+raw %>% glimpse()
+
+# Numeric variables
+numeric_vars <- raw %>% 
+  select_if(is.numeric) %>% 
+  colnames()
+numeric_vars
+
+df_numeric <- raw %>% 
+  select(all_of(numeric_vars))
+
+correlation <- df_numeric %>% select(all_of(numeric_vars)) %>% 
+  correlate()
+rplot(correlation)
+
+# Categorical variables (mode and key)
+key_labels <- c("C", "C#/Db", "D", "D#/Eb", "E", "F", "F#/Gb", "G", "G#/Ab", "A", "A#/Bb", "B")
+
+raw %>% 
+  mutate(key = factor(key, levels = 0:11, labels=key_labels)
+df_categorical
+# Old EDA (Replaced by work ^^^^)
 
 # Look at shape and column types
 raw %>% glimpse()
