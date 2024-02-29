@@ -30,7 +30,7 @@ setwd('./555/spotify-analytics/data/')
 
 sample <- slice_sample(raw, prop = .4)
 
-raw %>% 
+numeric_plot <- raw %>% 
   distinct() %>% 
   select(track_popularity, danceability, acousticness, energy, loudness, instrumentalness, speechiness, liveness, valence) %>% 
   pivot_longer(
@@ -45,7 +45,7 @@ raw %>%
 
 # Genres
 
-raw %>% 
+genres_plot <- raw %>% 
   distinct() %>%
   select(track_popularity, playlist_genre, playlist_subgenre) %>% 
   pivot_longer(
@@ -60,7 +60,7 @@ raw %>%
 
 #Key and Mode
 
-raw %>% 
+key_mode_plot <- raw %>% 
   distinct() %>%
   mutate(key = as.character(key), mode = as.character(mode)) %>% 
   select(track_popularity, key, mode) %>% 
@@ -76,12 +76,24 @@ raw %>%
 
 # Release Date
 
+# Months have a few more values we can extract that this fails to capture but this is sufficient for exploration
 dates <- raw %>% 
   distinct() %>% 
   select(track_popularity, track_album_release_date) %>% 
   mutate(formatted_date = ymd(track_album_release_date)) %>% 
   mutate(year = if_else(!is.na(formatted_date),year(formatted_date),year(as.numeric(substr(track_album_release_date, 1, 4)))), month = month(formatted_date))
 
+year_plot <- dates %>% 
+  mutate(year_chr = as.character(year)) %>% 
+  ggplot(aes(x = year_chr, y = track_popularity, fill = year_chr)) +
+  geom_violin() +
+  theme_bw()
+
+month_plot <- dates %>% 
+  mutate(month_chr = as.character(month)) %>% 
+  ggplot(aes(x = month_chr, y = track_popularity, fill = month_chr)) +
+  geom_violin() +
+  theme_bw()
 
 
 dates %>% 
