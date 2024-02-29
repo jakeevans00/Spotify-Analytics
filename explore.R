@@ -109,278 +109,28 @@ raw %>%
   summarize() %>% 
   print(n=3000)
 
-# Spencer: Summarize the characteristics of the remaining variables in the dataset at a high level
-
-raw <- read_csv('https://www.dropbox.com/scl/fi/2bbujng7y0dxpj8blb4ej/19_train.csv?rlkey=k8pxvbva2jwr0qp7oj1cc9ul5&dl=1')
-
-colnames(raw)
-
-raw %>% 
-  glimpse
-
-raw %>% 
-  count(track_name) %>% 
-  arrange(desc(n))
-
-raw %>% 
-  select(track_album_release_date) %>% 
-  print(n = 50)
-
-#Like variables:---------------------------------------------------------------------------------------------------
-calculate_jaccard_similarity <- function(df) {
-  num_cols <- ncol(df)
-  
-  # Initialize a matrix to store the Jaccard similarities
-  similarity_matrix <- matrix(0, ncol = num_cols, nrow = num_cols, dimnames = list(names(df), names(df)))
-  
-  # Calculate Jaccard similarity for each pair of columns
-  for (i in 1:(num_cols - 1)) {
-    for (j in (i + 1):num_cols) {
-      intersection <- sum(df[, i] == df[, j] & !is.na(df[, i]) & !is.na(df[, j]))
-      union <- sum(!is.na(df[, i])) + sum(!is.na(df[, j])) - intersection
-      
-      # Calculate Jaccard similarity index
-      jaccard_similarity <- intersection / union
-      
-      # Store the result in the matrix
-      similarity_matrix[i, j] <- jaccard_similarity
-      similarity_matrix[j, i] <- jaccard_similarity
-    }
-  }
-  
-  return(similarity_matrix)
-}
-
-result_matrix <- calculate_jaccard_similarity(df)
-
-result_df <- as.data.frame(as.table(result_matrix))
-
-jaccard_similarity_plot <- ggplot(result_df, aes(Var1, Var2, fill = Freq)) +
-  geom_tile(color = "white") +
-  scale_fill_gradient(low = "white", high = "blue") +
-  labs(title = "Jaccard Similarity between Variables",
-       x = "Variable 1", y = "Variable 2") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
-
-#Number of categorical vs continuous variables-----------------------------------------------------------------------------------------------------------------------------------------------
-raw %>%
-  summarise_all(class) %>%
-  gather(original_column, data_type) %>% 
-  print(n = 30)
-
-#Relevant patterns of missingness or odd distributions---------------------------------------------------------------------------------------------------------------------------------------
-
-#Rows with any missing data
-missing <- raw %>% 
-  subset(!complete.cases(raw)) 
-missing
-
-#Double check missing data
-raw %>%
-  filter(!complete.cases(.))
-
-#If key = -1, no key was detected. this code checks for any key values that weren't found
-raw %>% 
-  filter(key < 0)
-
-raw %>% 
-  select(key) %>% 
-  arrange(key)
-
-
-#No track popularity
-raw %>% 
-  filter(track_popularity == 0)
-
-#Numeric Columns
-
-#energy
-raw %>% 
-  select(energy) %>% 
-  print(n = 200)
-
-raw %>% 
-  select(energy) %>% 
-  summary(raw)
-
-energy_plot <- raw %>%
-  ggplot(aes(x = energy)) +
-  geom_histogram(bins = 15, alpha = 0.5) +
-  labs(
-    title = "energy",
-  ) +
-  theme_bw()
-
-#instrumentalness
-raw %>% 
-  select(instrumentalness) %>% 
-  summary(raw)
-
-instrumentalness_plot <- raw %>%
-  ggplot(aes(x = instrumentalness)) +
-  geom_histogram(bins = 15, alpha = 0.5) +
-  labs(
-    title = "instrumentalness",
-  ) +
-  theme_bw()
-
-#tempo
-raw %>% 
-  select(tempo) %>% 
-  summary(raw)
-
-tempo_plot <- raw %>%
-  ggplot(aes(x = tempo)) +
-  geom_histogram(bins = 15, alpha = 0.5) +
-  labs(
-    title = "tempo",
-  ) +
-  theme_bw()
-
-raw %>% 
-  select(tempo) %>% 
-  arrange(tempo)
-
-raw %>% 
-  filter(tempo == 0)
-
-#speechiness
-speechiness_plot <- raw %>%
-  ggplot(aes(x = speechiness)) +
-  geom_histogram(bins = 15, alpha = 0.5) +
-  labs(
-    title = "speechiness",
-  ) +
-  theme_bw()
-
-#liveness
-liveness_plot <- raw %>%
-  ggplot(aes(x = liveness)) +
-  geom_histogram(bins = 15, alpha = 0.5) +
-  labs(
-    title = "liveness",
-  ) +
-  theme_bw()
-
-#duration_ms
-duration_minutes_plot <- raw %>%
-  mutate(duration_minutes = duration_ms / (1000 * 60)) %>%
-  ggplot(aes(x = duration_minutes)) +
-  geom_histogram(bins = 15, alpha = 0.5) +
-  labs(
-    title = "Duration in Minutes",
-  ) +
-  theme_bw()
-
-
-#danceability
-danceability_plot <- raw %>%
-  ggplot(aes(x = danceability)) +
-  geom_histogram(bins = 15, alpha = 0.5) +
-  labs(
-    title = "danceability",
-  ) +
-  theme_bw()
-
-#loudness
-loudness_plot <- raw %>%
-  ggplot(aes(x = loudness)) +
-  geom_histogram(bins = 15, alpha = 0.5) +
-  labs(
-    title = "loudness",
-  ) +
-  theme_bw()
-
-raw %>% 
-  select(loudness) %>% 
-  summary(raw)
-
-raw %>% 
-  select(loudness) %>% 
-  arrange(loudness)
-
-#acousticness
-acousticness_plot <- raw %>%
-  ggplot(aes(x = acousticness)) +
-  geom_histogram(bins = 15, alpha = 0.5) +
-  labs(
-    title = "acousticness",
-  ) +
-  theme_bw()
-
-#valence
-valence_plot <- raw %>%
-  ggplot(aes(x = valence)) +
-  geom_histogram(bins = 15, alpha = 0.5) +
-  labs(
-    title = "valence",
-  ) +
-  theme_bw()
-
-#Categorical Columns
-
-#key
-key_plot <- raw %>%
-  ggplot(aes(x = key)) +
-  geom_bar(fill = "skyblue", alpha = 0.7) +
-  labs(
-    title = "key",
-  ) +
-  theme_minimal()
-
-#mode
-mode_plot <- raw %>%
-  ggplot(aes(x = mode)) +
-  geom_bar(fill = "skyblue", alpha = 0.7) +
-  labs(
-    title = "mode",
-  ) +
-  theme_minimal()
-
-#playlist_genre
-playlist_genre_plot <- raw %>%
-  ggplot(aes(x = playlist_genre)) +
-  geom_bar(fill = "skyblue", alpha = 0.7) +
-  labs(
-    title = "playlist_genre",
-  ) +
-  theme_minimal()
-
-#playlist_subgenre
-playlist_subgenre_plot <- raw %>%
-  ggplot(aes(x = playlist_subgenre)) +
-  geom_bar(fill = "skyblue", alpha = 0.7) +
-  labs(
-    title = "playlist_subgenre",
-  ) +
-  theme_minimal()
-
-#track_name
-track_name_plot <- raw %>%
-  ggplot(aes(x = track_name)) +
-  geom_bar(fill = "skyblue", alpha = 0.7) +
-  labs(
-    title = "track_name",
-  ) +
-  theme_minimal()
-
-#High level overview-----------------------------------------------------------------------------------------------------------------------------------------------
-summary(raw)
-
-df[sample(nrow(df), 10), ]
-
-
 # Jake: Examine effects of independent vars on dependent
 
 library(corrr)
 
 # Here are all the columns in the database
+
+# Explore dependent variable
 raw %>% glimpse()
+raw %>% filter(track_popularity > 98)
+
+summary_stats <- summary(raw$track_popularity)
+summary_sta
+
+sample %>% 
+ggplot(aes(x=track_popularity, fill=track_popularity)) +
+geom_histogram(fill="orange", alpha=0.6) +
+  theme_bw()
 
 # Numeric variables
 numeric_vars <- raw %>% 
   select_if(is.numeric) %>% 
+  select(-mode, -key) %>% 
   colnames()
 numeric_vars
 
@@ -391,13 +141,19 @@ correlation <- df_numeric %>% select(all_of(numeric_vars)) %>%
   correlate()
 rplot(correlation)
 
+matrix <- cor(df_numeric, method=c("pearson"))
+
+library(corrplot)
+corrplot(matrix, type="upper", tl.col="black")
+
 # Categorical variables (mode and key)
 key_labels <- c("C", "C#/Db", "D", "D#/Eb", "E", "F", "F#/Gb", "G", "G#/Ab", "A", "A#/Bb", "B")
 
 raw %>% 
   mutate(key = factor(key, levels = 0:11, labels=key_labels)
-df_categorical
-# Old EDA (Replaced by work ^^^^)
+
+
+# Old EDA (Used by work ^^^^)
 
 # Look at shape and column types
 raw %>% glimpse()
